@@ -1,0 +1,83 @@
+/* maxima -b delta.mac */
+
+/* Define some functions */
+vector(x, y, z):= transpose(matrix([x, y, z]));
+magnitude(x):= dotproduct(x, x); 
+
+assume(z1 > z, z2 > z, z3 > z);
+assume(rho > 0, L > 0, L > rho);
+solve(subst(0, x, subst(0, y, Eq1)), z);
+
+N: vector(x, y, z);
+
+theta: 2*%pi/3;
+
+R1: matrix([1,0,0],
+           [0,1,0],
+	   [0,0,1]);
+
+R2: matrix([cos(theta),-sin(theta),0],
+	   [sin(theta),cos(theta),0],
+           [0,0,1]);
+
+R3: matrix([cos(theta),sin(theta),0],
+           [-sin(theta),cos(theta),0],
+           [0,0,1]);
+
+P1: R1 . vector(rho, 0, z1);
+P2: R2 . vector(rho, 0, z2);
+P3: R3 . vector(rho, 0, z3);
+
+/* System of equations */
+Eq1: L^2 = magnitude(N-P1);
+Eq2: L^2 = magnitude(N-P2);
+Eq3: L^2 = magnitude(N-P3);
+
+Z1: part(solve(Eq1, z1), 2, 2);
+Z2: part(solve(Eq2, z2), 2, 2);
+Z3: part(solve(Eq3, z3), 2, 2);
+
+diff(Z1, x, 1);
+diff(Z1, y, 1);
+diff(Z2, x, 1);
+diff(Z2, y, 1);
+diff(Z3, x, 1);
+diff(Z3, y, 1);
+
+subst(0, y, subst(0, x, Z1));
+subst(0, y, subst(0, x, Z2));
+subst(0, y, subst(0, x, Z3));
+
+/* Resolve y */
+Sy: factor(part(solve(Eq2 - Eq3, y), 1, 2));
+A: factor(coeff(expand(Sy), z, 0));
+B: factor(coeff(expand(Sy), z));
+
+/* Resolve x */
+Sx: subst(A*z+B, y, part(solve(Eq2 - Eq1, x), 1, 2));
+C: factor(coeff(expand(Sx), z, 0));
+D: factor(coeff(expand(Sx), z));
+
+/* Resolve z */
+EqZ: subst(c*z+d, x, subst(a*z+b, y, part(Eq1, 2)));
+E: factor(coeff(expand(EqZ), z, 0));
+F: factor(coeff(expand(EqZ), z));
+G: factor(coeff(expand(EqZ), z^2));
+
+solve(L^2 = g*z^2 + f*z + e, z);
+
+/* EqZ: part(subst(C*z+D, x, subst(A*z+B, y, Eq1)), 2); */
+
+/*
+EqZ: expand(part(subst(C*z+D, x, subst(A*z+B, y, Eq1)), 2));
+E: factor(coeff(expand(EqZ), z, 0));
+F: factor(coeff(expand(EqZ), z));
+G: factor(coeff(expand(EqZ), z^2));
+*/
+
+subst(z2, z3, A);
+subst(z2, z3, B);
+subst(z1, z2, subst(z2, z3, B));
+subst(z1, z2, subst(z2, z3, C));
+/* -> 0 */
+/* -> [z=z1−sqrt(L^2−rho^2),z=sqrt(L^2−rho^2)+z1] */

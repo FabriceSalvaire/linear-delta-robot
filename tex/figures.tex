@@ -144,19 +144,21 @@ dvips,%
   % z curve
   \coordinate (C) at (\Rho,0);
   \coordinate (Pcx) at (\Nx,-1);
-  \coordinate (Pcy) at (0,\z1-\Nz);
-  \coordinate (Pc) at (\Nx,\z1-\Nz);
+  \coordinate (Pcy) at (0,\z1);
+  \coordinate (Pc) at (\Nx,\z1);
+  \coordinate (Oc) at (\Rho,\Nz);
   \begin{scope}[blue, fill=blue]
     \draw (Pcx) -- +(0,\AxesLengthZ);
     \draw (Pcy) -- +(\AxesLength,0);
-    \fill (Pc) circle (2pt);
-    \draw (C) -- (Pc);
+    \draw (Oc) -- (Pc);
     \draw [<->, thick] (\Radius,\Nz) -- +(0,\ArmLength);
-    \draw [<->, thick] (\Rho,\Nz) -- +(-\ArmLength,0);
+    \draw [<->, thick] (Oc) -- +(-\ArmLength,0);
     % \fill (\Rho,\Nz) circle (2pt);
     % \clip (-\Rho,0) rectangle(\Rho,\ArmLength);
     % \draw (C) circle(\ArmLength);
-    \draw[<->, thick] (\Rho, \ArmLength) arc [start angle=90, end angle=180, x radius=\ArmLength, y radius=\ArmLength];
+    \draw[<->, thick] ($ (Oc) + (0,\ArmLength) $) arc [start angle=90, end angle=180, x radius=\ArmLength, y radius=\ArmLength];
+    \fill (Pc) circle (2pt);
+    \fill [blue] (Oc) circle (1pt); % z curve center
   \end{scope}
   % nacelle
   \draw [red, thick] ($ (N) - (\NacelleRadius,0) $) -- (N1);
@@ -172,14 +174,12 @@ dvips,%
   \fill [red] (N1) circle (2pt);
   \fill [red] (A1) circle (2pt);
   \fill [blue] (P1) circle (2pt);
-  \fill [blue] (\Rho,0) circle (2pt); % z curve center
   % lengths
   % \draw ($(O)!.5!(\Radius,0)$) node[anchor=south] {$R$};
   \draw (\Radius,0) node[anchor=north] {$R$};
   \draw (\Rho,0) node[anchor=north] {$\rho$};
   % \draw ($(\Radius,0)!.5!(A1)$) node[anchor=west] {$z_1$};
   \draw (A1) node[anchor=north west] {$z_1$};
-  \draw ($ (Pcy) + (\Radius,0) $) node[anchor=north west] {$z_1-z$};
   \draw (\Nx,0) node[anchor=north] {$x$};
   \draw (0,\Nz) node[anchor=east] {$z$};
   \draw ($(N1)!.5!(A1)$) node[anchor=north] {$L$};

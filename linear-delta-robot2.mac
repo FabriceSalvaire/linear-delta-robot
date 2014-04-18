@@ -1,0 +1,75 @@
+/* maxima -b delta.mac */
+
+/* Define some functions */
+vector(x, y, z):= transpose(matrix([x, y, z]));
+magnitude(x):= dotproduct(x, x); 
+
+assume(z1 > z, z2 > z, z3 > z);
+assume(rho > 0, L > 0, L > rho);
+solve(subst(0, x, subst(0, y, Eq1)), z);
+
+/* Nacelle coordinate */
+N: vector(x, y, z);
+
+/* Axis angle */
+theta: 2*%pi/3;
+
+/* Rotation matrix for each axis */
+R1: matrix([1,0,0],
+           [0,1,0],
+	   [0,0,1]);
+
+R2: matrix([cos(theta),-sin(theta),0],
+	   [sin(theta),cos(theta),0],
+           [0,0,1]);
+
+R3: matrix([cos(theta),sin(theta),0],
+           [-sin(theta),cos(theta),0],
+           [0,0,1]);
+
+/* Ball joint Point */
+P1: R1 . vector(rho, 0, z1);
+P2: R2 . vector(rho, 0, z2);
+P3: R3 . vector(rho, 0, z3);
+
+/* System of equations */
+Eq1: subst(-q1, z - z1, magnitude(N-P1)) - L^2;
+Eq2: subst(-q2, z - z2, magnitude(N-P2)) - L^2;
+Eq3: subst(-q3, z - z3, magnitude(N-P3)) - L^2;
+
+/* Indirect Cinematic Zi functions  */
+Q1: part(solve(Eq1, q1), 2, 2);
+Q2: part(solve(Eq2, q2), 2, 2);
+Q3: part(solve(Eq3, q3), 2, 2);
+
+/* d z_i / d x_i */
+diff(Q1, x, 1);
+diff(Q1, y, 1);
+diff(Q2, x, 1);
+diff(Q2, y, 1);
+diff(Q3, x, 1);
+diff(Q3, y, 1);
+
+/* z_i @origin */
+subst(0, y, subst(0, x, Q1));
+subst(0, y, subst(0, x, Q2));
+subst(0, y, subst(0, x, Q3));
+
+/* Direct Cinematic */
+/* WRONG */
+S: solve([Eq1, Eq2 - Eq3], [x, y]);
+Sx: part(S, 2, 1, 2);
+Sy: part(S, 2, 2, 2);
+
+expand(subst(Sx, x, subst(Sy, y, Eq1)));
+expand(subst(Sx, x, subst(Sy, y, Eq2)));
+expand(subst(Sx, x, subst(Sy, y, Eq3)));
+
+/* d x_i / d q_i */
+diff(Sx, q1, 1);
+diff(Sx, q2, 1);
+diff(Sx, q3, 1);
+diff(Sy, q1, 1);
+diff(Sy, q2, 1);
+diff(Sy, q3, 1);
+

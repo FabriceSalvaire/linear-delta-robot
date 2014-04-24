@@ -312,10 +312,10 @@ def plot_delta():
 
     z = 0
 
-    X = R
-    # X = int(.5*R)
+    # X = R
+    X = int(.8*R)
     # number_of_points = (2*X + 1)*2/10
-    number_of_points = 50
+    number_of_points = 300
     x = np.linspace(-X, X, number_of_points)
     x, y = np.meshgrid(x, x)
 
@@ -329,7 +329,9 @@ def plot_delta():
     # axe.imshow(valid, extent=(-X, X, -X, X), aspect='equal', cmap=cm.Blues)
 
     z1, z2, z3 = indirect_cinematic((xv, yv, z), stack_zi=False)
-    # z1 += z_step
+    #z1 += z_step
+    #z2 += z_step
+    z3 += z_step
     z1 = np.where(valid, z1, z0)
     z2 = np.where(valid, z2, z0)
     z3 = np.where(valid, z3, z0)
@@ -339,34 +341,60 @@ def plot_delta():
     z3.shape = number_of_points**2, 1
     zi = np.hstack((z1, z2, z3))
 
-    for j in xrange(number_of_points):
-        for k in xrange(number_of_points):
-            print
-            pinput = np.array((xv[j, k], yv[j, k], z))
-            print pinput
-            zij = zi[j*number_of_points + k]
-            print zij
-            p = direct_cinematic(zij)
-            assert(np.all((p - pinput) < 1e-6))
+    # for j in xrange(number_of_points):
+    #     for k in xrange(number_of_points):
+    #         print
+    #         pinput = np.array((xv[j, k], yv[j, k], z))
+    #         print pinput
+    #         zij = zi[j*number_of_points + k]
+    #         print zij
+    #         p = direct_cinematic(zij)
+    #         assert(np.all((p - pinput) < 1e-6))
 
-    # p = direct_cinematic(zi)
-    # xdz = p[:,0]
-    # xdz.shape = x.shape
-    # dx = xdz - x
-    # print np.min(dx), np.max(dx)
-    # # p.shape = number_of_points, number_of_points, 3
+    p = direct_cinematic(zi)
+    p.shape = number_of_points, number_of_points, 3
+    px = p[:,:,0]
+    py = p[:,:,1]
+    pz = p[:,:,2]
+    # assert(np.all((px - xv) < 1e-6))
+    # assert(np.all((py - yv) < 1e-6))
+    # assert(np.all((pz - z) < 1e-6))
 
-    # figure = plt.figure()
-    # axe = plt.subplot(111)
-    # # axe = plt.subplot(111, aspect='equal')
-    # axe.grid()
-    # axe.set_title('delta')
-    # # axe.contour(p[:,:,0], p[:,:,1], p[:,:,2], 50)
-    # # axe.plot(p[:,0], 'o')
+    dx = px - xv
+    dy = py - yv
+    dz = pz - z
+    print 'dx:', np.min(dx), np.max(dx)
+    print 'dy:', np.min(dy), np.max(dy)
+    print 'dz:', np.min(dz), np.max(dz)
+
+    dx *= valid
+    dy *= valid
+    dz *= valid
+
+    for di, axis in (dx, 'x'), (dy, 'y'), (dz, 'z'):
+        di *= 1000 # um
+        figure = plt.figure()
+        # axe = plt.subplot(111)
+        axe = plt.subplot(111, aspect='equal')
+        axe.grid()
+        axe.set_title('delta ' + axis)
+        # CS = axe.contourf(xv, yv, di, 50)
+        # axe.clabel(CS, fontsize=9, inline=1)
+        # plt.colorbar(CS)
+        image = axe.imshow(di, extent=(-X, X, -X, X), aspect='equal')
+        plt.colorbar(image)
+        patch0 = Circle((0, 0), R, fc="white", alpha=0)
+        axe.add_artist(patch0)
+        axe.plot((0, Ax1, Ax2, Ax3, Px1, Px2, Px3),
+                 (0, Ay1, Ay2, Ay3, Py1, Py2, Py3),
+                 'o')
+
+    # axe.contour(p[:,:,0], p[:,:,1], p[:,:,2], 50)
+    # axe.plot(p[:,0], 'o')
     # axe.plot(dx, 'o')
-    # # axe.plot(z1, 'o')
-    # # axe.plot(z2)
-    # # axe.plot(z3)
+    # axe.plot(z1, 'o')
+    # axe.plot(z2)
+    # axe.plot(z3)
 
 ####################################################################################################
 

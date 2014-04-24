@@ -1,0 +1,71 @@
+/* maxima -b file.mac */
+
+reset();
+
+load("vect");
+load("eigen");
+
+/* Define some functions */
+norm_square(x):= x.x;
+norm(x):= sqrt(norm_square(x));
+
+/* Let be a point in the space */
+P: [x, y, z];
+
+/* Centres of the spheres in the simplified coordinate system */
+O1: [0, 0, 0];
+O2: [d, 0, 0];
+O3: [i, j, 0];
+
+/* Equations of the spheres */
+S1: norm_square(P - O1) - r1^2;
+S2: norm_square(P - O2) - r2^2;
+S3: norm_square(P - O3) - r3^2;
+
+/*
+ * f(x,y,z) = 0
+ * g(x,y,z) = 0
+ * =>
+ * f(x,y,z) - g(x,y,z) = 0
+ * =/=>
+ * f(x,y,z) = g(x,y,z) = 0
+ *
+ */
+
+/* We compute the intersection of C1 and C2 */
+
+expand(S1-S2);
+solve(%, x);
+X: part(%, 1, 2);
+
+/* We assume d - r1 < r2 < d + r2 */
+
+/* Intersection of S1 and S2 is a circle */
+Circle: subst(X, x, S1);
+
+solve(S1, z^2);
+Z2: part(%, 1, 2);
+expand(subst(Z2, z^2, S3));
+solve(%, y);
+Y: part(%, 1, 2);
+
+Y: ratsimp(subst(X, x, Y));
+Z2: ratsimp(subst(X, x, subst(Y, y, Z2)));
+
+/* Centres of the spheres */
+P1: [p1_x, p1_y, p1_z];
+P2: [p2_x, p2_y, p2_z];
+P3: [p3_x, p3_y, p3_z];
+
+d: norm(P2 - P1);
+
+e_x: (P2 - P1)/d;
+i: (P3 - P1).e_x;
+
+e_y: unitvector(P3 - P1 - i*e_x);
+j: (P3 - P1).e_y;
+
+/* e_z: e_x ~ e_y; */
+
+/* Solution */
+P1 + P*[e_x, e_y, e_z];

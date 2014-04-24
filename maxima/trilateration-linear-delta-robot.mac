@@ -1,0 +1,82 @@
+/* maxima -b file.mac */
+
+reset();
+
+load("vect");
+load("eigen");
+
+/* Define some functions */
+norm_square(x):= x.x;
+norm(x):= sqrt(norm_square(x));
+
+/* Let be a point in the space */
+O: [x, y, z];
+
+/* Centres of the spheres in the simplified coordinate system */
+O1: [0, 0, 0];
+O2: [d, 0, 0];
+O3: [i, j, 0];
+
+/* Equations of the spheres */
+S1: norm_square(O - O1) - L^2;
+S2: norm_square(O - O2) - L^2;
+S3: norm_square(O - O3) - L^2;
+
+/*
+ * f(x,y,z) = 0
+ * g(x,y,z) = 0
+ * =>
+ * f(x,y,z) - g(x,y,z) = 0
+ * =/=>
+ * f(x,y,z) = g(x,y,z) = 0
+ *
+ */
+
+/* We compute the intersection of C1 and C2 */
+
+expand(S1-S2);
+solve(%, x);
+X: part(%, 1, 2); /* x = d/2 */
+
+/* We assume d - r1 < r2 < d + r2 */
+
+/* Intersection of S1 and S2 is a circle */
+Circle: subst(X, x, S1);
+
+solve(S1, z^2);
+Z2: part(%, 1, 2);
+expand(subst(Z2, z^2, S3));
+solve(%, y);
+Y: part(%, 1, 2);
+
+Y: ratsimp(subst(X, x, Y));
+Z2: ratsimp(subst(X, x, subst(Y, y, Z2)));
+
+assume(L > 0, rho > 0);
+assume(z1 > 0, z2 > 0, z3 > 0);
+
+/* Centres of the spheres */
+P1: [rho, 0, z1];
+P2: [-rho/2, rho*sqrt(3)/2, z2];
+P3: [-rho/2, -rho*sqrt(3)/2, z3];
+
+D: norm(P2 - P1);
+
+e_x: ratsimp(unitvector(P2 - P1));
+I: (P3 - P1).e_x;
+
+e_y: ratsimp(unitvector(P3 - P1 - I*e_x));
+J: ratsimp((P3 - P1).e_y);
+
+e_z: ratsimp(express(e_x ~ e_y));
+
+/* Solution */
+P: P1 + X*e_x + Y*e_y + sqrt(Z2)*e_z;
+PP: subst(D, d, subst(I, i, subst(J, j, P)));
+
+/* Check z1 = z2 = z3 => x = y = 0 */
+ratsimp(subst(z1,z3,subst(z1,z2,PP)));
+
+/* Check z2 = z3 => y = 0 */
+ratsimp(subst(z2,z3,part(PP,2)));
+

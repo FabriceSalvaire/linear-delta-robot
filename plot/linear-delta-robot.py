@@ -310,6 +310,8 @@ def plot_zi():
 
 def plot_delta():
 
+    # Fixme: y -> -y ???
+
     z = 0
 
     # X = R
@@ -330,8 +332,8 @@ def plot_delta():
 
     z1, z2, z3 = indirect_cinematic((xv, yv, z), stack_zi=False)
     #z1 += z_step
-    #z2 += z_step
-    z3 += z_step
+    z2 += z_step
+    #z3 += z_step
     z1 = np.where(valid, z1, z0)
     z2 = np.where(valid, z2, z0)
     z3 = np.where(valid, z3, z0)
@@ -370,6 +372,8 @@ def plot_delta():
     dx *= valid
     dy *= valid
     dz *= valid
+
+    # dy *= -1
 
     for di, axis in (dx, 'x'), (dy, 'y'), (dz, 'z'):
         di *= 1000 # um

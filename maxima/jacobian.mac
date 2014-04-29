@@ -1,0 +1,38 @@
+J: matrix([(x-x1)/(z-z1), (y-y1)/(z-z1), 1],
+          [(x-x2)/(z-z2), (y-y2)/(z-z2), 1],
+          [(x-x3)/(z-z3), (y-y3)/(z-z3), 1]);
+
+J: matrix([dx1/dz1, dy1/dz1, 1],
+          [dx2/dz2, dy2/dz2, 1],
+          [dx3/dz3, dy3/dz3, 1]);
+
+D: determinant(J);
+/*
+   dx1/dz1 * (dy2/dz2 - dy3/dz3)
+ - dy1/dz1 * (dx2/dz2 - dx3/dz3) 
+ + (dx2*dy3) / (dz2*dz3)
+ - (dx3*dy2) / (dz2*dz3)
+*/
+Ds: ((dx1*dy2 - dx2*dy1)*dz3 + (dx3*dy1 - dx1*dy3)*dz2 + (dx2*dy3 - dx3*dy2)*dz1) / (dz1*dz2*dz3);
+
+ratsimp(D - Ds);
+
+Ji: ratsimp(invert(J));
+
+/* J^-1 * D */
+JiD: matrix(
+  [ (dy2/dz2 - dy3/dz3),  -(dy1/dz1 - dy3/dz3),  (dy1/dz1 - dy2/dz2)],
+  [-(dx2/dz2 - dx3/dz3),   (dx1/dz1 - dx3/dz3), -(dx1/dz1 - dx2/dz2)],
+  [ (dx2*dy3 - dx3*dy2)/(dz2*dz3), -(dx1*dy3 - dx3*dy1)/(dz1*dz3), (dx1*dy2 - dx2*dy1)/(dz1*dz2)]);
+
+ratsimp(Ji*D - JiD);
+
+/* J^-1 */
+
+Jis: 1 / ((dx1*dy2 - dx2*dy1)*dz3 + (dx3*dy1 - dx1*dy3)*dz2 + (dx2*dy3 - dx3*dy2)*dz1) *
+matrix(
+  [ (dy2*dz1*dz3 - dy3*dz1*dz2),  -(dy1*dz2*dz3 - dy3*dz1*dz2),  (dy1*dz2*dz3 - dy2*dz1*dz3)],
+  [-(dx2*dz1*dz3 - dx3*dz1*dz2),   (dx1*dz2*dz3 - dx3*dz1*dz2), -(dx1*dz2*dz3 - dx2*dz1*dz3)],
+  [ (dx2*dy3 - dx3*dy2)*dz1, -(dx1*dy3 - dx3*dy1)*dz2, (dx1*dy2 - dx2*dy1)*dz3]);
+
+ratsimp(Ji - Jis);

@@ -6,11 +6,7 @@ import numpy as np
 
 from matplotlib import cm
 from matplotlib.patches import Circle
-from matplotlib.ticker import LinearLocator, FormatStrFormatter
-from mpl_toolkits.axes_grid.anchored_artists import AnchoredDrawingArea
-from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
-import pylab
 
 ####################################################################################################
 #
@@ -210,6 +206,109 @@ def compute_valid_region(x, y, radius=R):
 
 ####################################################################################################
 
+def compute_jacobian_determinant(x, y, z, z1, z2, z3):
+
+    dx1 = x - Ax1
+    dx2 = x - Ax2
+    dx3 = x - Ax3
+
+    dy1 = y - Ay1
+    dy2 = y - Ay2
+    dy3 = y - Ay3
+
+    dz1 = z - z1
+    dz2 = z - z2
+    dz3 = z - z3
+
+    D = ((dx1*dy2 - dx2*dy1) / (dz1*dz2) +
+         (dx3*dy1 - dx1*dy3) / (dz1*dz3) +
+         (dx2*dy3 - dx3*dy2) / (dz2*dz3))
+
+    return D
+
+####################################################################################################
+
+def compute_jacobian(x, y, z, z1, z2, z3, dx, dy, dz):
+
+    Dx1 = x - Ax1
+    Dx2 = x - Ax2
+    Dx3 = x - Ax3
+
+    Dy1 = y - Ay1
+    Dy2 = y - Ay2
+    Dy3 = y - Ay3
+
+    Dz1 = z - z1
+    Dz2 = z - z2
+    Dz3 = z - z3
+
+    dz1 = Dx1/Dz1*dx + Dy1/Dz1*dy + dz
+    dz2 = Dx2/Dz2*dx + Dy2/Dz2*dy + dz
+    dz3 = Dx3/Dz3*dx + Dy3/Dz3*dy + dz
+
+    return dz1, dz2, dz3
+
+####################################################################################################
+
+def compute_jacobian_inverse(x, y, z, z1, z2, z3, dz1, dz2, dz3):
+
+    Dx1 = x - Ax1
+    Dx2 = x - Ax2
+    Dx3 = x - Ax3
+
+    Dy1 = y - Ay1
+    Dy2 = y - Ay2
+    Dy3 = y - Ay3
+
+    Dz1 = z - z1
+    Dz2 = z - z2
+    Dz3 = z - z3
+
+    denominator = (Dx1*Dy2 - Dx2*Dy1)*Dz3 + (Dx3*Dy1 - Dx1*Dy3)*Dz2 + (Dx2*Dy3 - Dx3*Dy2)*Dz1
+
+    dx =  (Dy2*Dz1*Dz3 - Dy3*Dz1*Dz2)*dz1 - (Dy1*Dz2*Dz3 - Dy3*Dz1*Dz2)*dz2 + (Dy1*Dz2*Dz3 - Dy2*Dz1*Dz3)*dz3
+    dy = -(Dx2*Dz1*Dz3 - Dx3*Dz1*Dz2)*dz1 + (Dx1*Dz2*Dz3 - Dx3*Dz1*Dz2)*dz2 - (Dx1*Dz2*Dz3 - Dx2*Dz1*Dz3)*dz3
+    dz = (Dx2*Dy3 - Dx3*Dy2)*Dz1*dz1 - (Dx1*Dy3 - Dx3*Dy1)*Dz2*dz2 + (Dx1*Dy2 - Dx2*Dy1)*Dz3*dz3
+
+    dx /= denominator
+    dy /= denominator
+    dz /= denominator
+
+    return dx, dy, dz
+
+####################################################################################################
+
+def test():
+
+    z = 1
+    zi = float(indirect_cinematic((0, 0, z), stack_zi=False)[0])
+    print "p = [0, 0, 1] :", direct_cinematic((zi, zi, zi))
+    
+    print
+    p = direct_cinematic((0, 0, 0), z_offset=L)
+    print "p:", p
+    print "zi = 0 :", indirect_cinematic(p) - L
+    
+    print
+    p = direct_cinematic((1, 2, 3), z_offset=L)
+    print "p:", p
+    print "zi = [1, 2, 3] :", indirect_cinematic(p) - L
+    
+    print
+    zi = []
+    X = 5
+    for z1 in xrange(-X, X):
+        for z2 in xrange(-X, X):
+            for z3 in xrange(-X, X):
+                zi.append((z1, z2, z3))
+    zi = np.array(zi)
+    print "zi :", zi
+    p = direct_cinematic(zi, z_offset=L)
+    print "p:", p
+    print "delta zi = 0 :", np.all((indirect_cinematic(p) - L - zi) < 1e-6)
+
+####################################################################################################
+
 def plot_workspace_circles():
 
     figure = plt.figure()
@@ -253,6 +352,126 @@ def plot_workspace():
 
 ####################################################################################################
 
+def plot_jacobian_determinant():
+
+    X = int(1.1*R)
+    number_of_points = (2*X + 1)*2/10
+    x = np.linspace(-X, X, number_of_points)
+    x, y = np.meshgrid(x, x)
+    valid = compute_valid_region(x, y)
+    xv = x * valid
+    yv = y * valid
+
+    z = 1
+    z1, z2, z3 = indirect_cinematic((xv, yv, z), stack_zi=False)
+    z1 = np.where(valid, z1, 0)
+    z2 = np.where(valid, z2, 0)
+    z3 = np.where(valid, z3, 0)
+
+    determinant = compute_jacobian_determinant(xv, yv, z, z1, z2, z3)
+    determinant = np.where(valid, determinant, 0)
+    print determinant
+
+    figure = plt.figure()
+    axe = plt.subplot(111, aspect='equal')
+    axe.set_title("Jacobian Determinant")
+    axe.grid()
+    # Fixme: colormap
+    image = axe.imshow(determinant, extent=(-X, X, -X, X), aspect='equal')
+    plt.colorbar(image)
+    patch0 = Circle((0, 0), R, fc="white", alpha=.1)
+    for patch in patch0,:
+        axe.add_artist(patch)
+    axe.plot((0, Ax1, Ax2, Ax3, Px1, Px2, Px3),
+             (0, Ay1, Ay2, Ay3, Py1, Py2, Py3),
+             'o')
+
+####################################################################################################
+
+def plot_jacobian():
+
+    X = int(1.1*R)
+    # number_of_points = (2*X + 1)*2/10
+    number_of_points = 100
+    x = np.linspace(-X, X, number_of_points)
+    x, y = np.meshgrid(x, x)
+    valid = compute_valid_region(x, y)
+    xv = x * valid
+    yv = y * valid
+
+    z = 1
+    z1, z2, z3 = indirect_cinematic((xv, yv, z), stack_zi=False)
+    z1 = np.where(valid, z1, 0)
+    z2 = np.where(valid, z2, 0)
+    z3 = np.where(valid, z3, 0)
+
+    dz1, dz2, dz3 = compute_jacobian(xv, yv, z, z1, z2, z3, z_step, 0, 0)
+    dz1 = np.where(valid, dz1, 0)
+    dz2 = np.where(valid, dz2, 0)
+    dz3 = np.where(valid, dz3, 0)
+
+    # dz1 /= z_step
+    # dz2 /= z_step
+    # dz3 /= z_step
+
+    # Plot dzi
+    for dzi, axis in (dz1, 'dz1'), (dz2, 'dz2'), (dz3, 'dz3'):
+        figure = plt.figure()
+        axe = plt.subplot(111, aspect='equal')
+        axe.set_title("{}/dt".format(axis))
+        axe.grid()
+        # Fixme: colormap
+        image = axe.imshow(dzi, extent=(-X, X, -X, X), aspect='equal')
+        plt.colorbar(image)
+        patch0 = Circle((0, 0), R, fc="white", alpha=.1)
+        for patch in patch0,:
+            axe.add_artist(patch)
+        axe.plot((0, Ax1, Ax2, Ax3, Px1, Px2, Px3),
+                 (0, Ay1, Ay2, Ay3, Py1, Py2, Py3),
+                 'o')
+
+####################################################################################################
+
+def plot_jacobian_inverse():
+
+    X = int(1.1*R)
+    # number_of_points = (2*X + 1)*2/10
+    number_of_points = 300
+    x = np.linspace(-X, X, number_of_points)
+    x, y = np.meshgrid(x, x)
+    valid = compute_valid_region(x, y)
+    xv = x * valid
+    yv = y * valid
+
+    z = 1
+    z1, z2, z3 = indirect_cinematic((xv, yv, z), stack_zi=False)
+    z1 = np.where(valid, z1, 0)
+    z2 = np.where(valid, z2, 0)
+    z3 = np.where(valid, z3, 0)
+
+    dx, dy, dz = compute_jacobian_inverse(xv, yv, z, z1, z2, z3, z_step, 0, 0)
+    dx = np.where(valid, dx, 0)
+    dy = np.where(valid, dy, 0)
+    dz = np.where(valid, dz, 0)
+
+    # Plot dxi
+    for dxi, axis in (dx, 'x'), (dy, 'y'), (dz, 'z'):
+        figure = plt.figure()
+        axe = plt.subplot(111, aspect='equal')
+        axe.set_title("{}/dt".format(axis))
+        axe.grid()
+        # Fixme: colormap
+        image = axe.imshow(dxi, extent=(-X, X, -X, X), aspect='equal')
+        plt.colorbar(image)
+        patch0 = Circle((0, 0), R, fc="white", alpha=.1)
+        for patch in patch0,:
+            axe.add_artist(patch)
+        axe.plot((0, Ax1, Ax2, Ax3, Px1, Px2, Px3),
+                 (0, Ay1, Ay2, Ay3, Py1, Py2, Py3),
+                 'o')
+
+####################################################################################################
+
 def plot_zi():
 
     X = int(1.1*R)
@@ -267,6 +486,7 @@ def plot_zi():
     z2 = np.where(valid, z2, 0)
     z3 = np.where(valid, z3, 0)
 
+    # Plot z1 contour
     figure = plt.figure()
     axe = plt.subplot(111, aspect='equal')
     axe.grid()
@@ -285,10 +505,7 @@ def plot_zi():
              (0, Ay1, Ay2, Ay3, Py1, Py2, Py3),
              'o')
 
-    # axe = figure.gca(projection='3d')
-    # axe.plot_surface(x, y, z1,
-    #                  rstride=1, cstride=1, cmap=cm.coolwarm, linewidth=0, antialiased=False)
-
+    # Plot zi contours
     figure = plt.figure()
     axe = plt.subplot(111, aspect='equal')
     axe.grid()
@@ -314,6 +531,7 @@ def plot_delta():
 
     z = 0
 
+    # Define the XY mesh
     # X = R
     X = int(.8*R)
     # number_of_points = (2*X + 1)*2/10
@@ -321,60 +539,65 @@ def plot_delta():
     x = np.linspace(-X, X, number_of_points)
     x, y = np.meshgrid(x, x)
 
+    # Compute the valid region
     valid = compute_valid_region(x, y, radius=R)
     xv = x * valid
     yv = y * valid
 
-    # figure = plt.figure()
-    # axe = plt.subplot(111, aspect='equal')
-    # axe.grid()
-    # axe.imshow(valid, extent=(-X, X, -X, X), aspect='equal', cmap=cm.Blues)
+    # Plot the valid region
+    if False:
+        figure = plt.figure()
+        axe = plt.subplot(111, aspect='equal')
+        axe.grid()
+        axe.imshow(valid, extent=(-X, X, -X, X), aspect='equal', cmap=cm.Blues)
 
+    # Compute zi
     z1, z2, z3 = indirect_cinematic((xv, yv, z), stack_zi=False)
-    #z1 += z_step
-    z2 += z_step
+
+    # Apply a step
+    z1 += z_step
+    # z2 += z_step
     #z3 += z_step
+
+    # Correct for valid region
     z1 = np.where(valid, z1, z0)
     z2 = np.where(valid, z2, z0)
     z3 = np.where(valid, z3, z0)
 
+    # Stack zi
     z1.shape = number_of_points**2, 1
     z2.shape = number_of_points**2, 1
     z3.shape = number_of_points**2, 1
     zi = np.hstack((z1, z2, z3))
 
-    # for j in xrange(number_of_points):
-    #     for k in xrange(number_of_points):
-    #         print
-    #         pinput = np.array((xv[j, k], yv[j, k], z))
-    #         print pinput
-    #         zij = zi[j*number_of_points + k]
-    #         print zij
-    #         p = direct_cinematic(zij)
-    #         assert(np.all((p - pinput) < 1e-6))
-
+    # Compute the direct cinematic for zi
     p = direct_cinematic(zi)
     p.shape = number_of_points, number_of_points, 3
     px = p[:,:,0]
     py = p[:,:,1]
     pz = p[:,:,2]
-    # assert(np.all((px - xv) < 1e-6))
-    # assert(np.all((py - yv) < 1e-6))
-    # assert(np.all((pz - z) < 1e-6))
 
+    # Compute dxi
     dx = px - xv
     dy = py - yv
     dz = pz - z
     print 'dx:', np.min(dx), np.max(dx)
     print 'dy:', np.min(dy), np.max(dy)
     print 'dz:', np.min(dz), np.max(dz)
+    if False:
+        # Check dxi = 0 when any step is applied
+        assert(np.all(dx < 1e-6))
+        assert(np.all(dy < 1e-6))
+        assert(np.all(dz < 1e-6))
 
+    # Correct for valid region
     dx *= valid
     dy *= valid
     dz *= valid
 
     # dy *= -1
 
+    # Plot dxi
     for di, axis in (dx, 'x'), (dy, 'y'), (dz, 'z'):
         di *= 1000 # um
         figure = plt.figure()
@@ -393,50 +616,15 @@ def plot_delta():
                  (0, Ay1, Ay2, Ay3, Py1, Py2, Py3),
                  'o')
 
-    # axe.contour(p[:,:,0], p[:,:,1], p[:,:,2], 50)
-    # axe.plot(p[:,0], 'o')
-    # axe.plot(dx, 'o')
-    # axe.plot(z1, 'o')
-    # axe.plot(z2)
-    # axe.plot(z3)
-
 ####################################################################################################
 
-def test():
-
-    z = 1
-    zi = float(indirect_cinematic((0, 0, z), stack_zi=False)[0])
-    print "p = [0, 0, 1] :", direct_cinematic((zi, zi, zi))
-    
-    print
-    p = direct_cinematic((0, 0, 0), z_offset=L)
-    print "p:", p
-    print "zi = 0 :", indirect_cinematic(p) - L
-    
-    print
-    p = direct_cinematic((1, 2, 3), z_offset=L)
-    print "p:", p
-    print "zi = [1, 2, 3] :", indirect_cinematic(p) - L
-    
-    print
-    zi = []
-    X = 5
-    for z1 in xrange(-X, X):
-        for z2 in xrange(-X, X):
-            for z3 in xrange(-X, X):
-                zi.append((z1, z2, z3))
-    zi = np.array(zi)
-    print "zi :", zi
-    p = direct_cinematic(zi, z_offset=L)
-    print "p:", p
-    print "delta zi = 0 :", np.all((indirect_cinematic(p) - L - zi) < 1e-6)
-
-####################################################################################################
-
-# plot_workspace_circles()
-# plot_workspace()
-# plot_zi()
-plot_delta()
+#plot_workspace_circles()
+#plot_workspace()
+#plot_jacobian_determinant()
+#plot_jacobian()
+plot_jacobian_inverse()
+#plot_zi()
+#plot_delta()
 plt.show()
 
 ####################################################################################################

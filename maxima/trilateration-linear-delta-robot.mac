@@ -1,4 +1,12 @@
+/**************************************************************************************************
+ *
+ * Linear Delta Robot: Direct Cinematic (trilateration)
+ *
+ **************************************************************************************************/
+
 /* maxima -b file.mac */
+
+/**************************************************************************************************/
 
 reset();
 
@@ -8,6 +16,8 @@ load("eigen");
 /* Define some functions */
 norm_square(x):= x.x;
 norm(x):= sqrt(norm_square(x));
+
+/**************************************************************************************************/
 
 /* Let be a point in the space */
 O: [x, y, z];
@@ -22,35 +32,31 @@ S1: norm_square(O - O1) - L^2;
 S2: norm_square(O - O2) - L^2;
 S3: norm_square(O - O3) - L^2;
 
-/*
- * f(x,y,z) = 0
- * g(x,y,z) = 0
- * =>
- * f(x,y,z) - g(x,y,z) = 0
- * =/=>
- * f(x,y,z) = g(x,y,z) = 0
- *
- */
-
 /* We compute the intersection of C1 and C2 */
 
 expand(S1-S2);
 solve(%, x);
 X: part(%, 1, 2); /* x = d/2 */
 
-/* We assume d - r1 < r2 < d + r2 */
+/* We assume that the first two spheres intersect in more than one point:
+ *   d - r1 < r2 < d + r2
+ */
 
 /* Intersection of S1 and S2 is a circle */
 Circle: subst(X, x, S1);
 
+/* We express z^2 from the S1 equation */ 
 solve(S1, z^2);
 Z2: part(%, 1, 2);
+/* and we substitute z^2 in the S3 equation to get y as a function of x */ 
 expand(subst(Z2, z^2, S3));
 solve(%, y);
 Y: part(%, 1, 2);
 
 Y: ratsimp(subst(X, x, Y));
 Z2: ratsimp(subst(X, x, subst(Y, y, Z2)));
+
+/**************************************************************************************************/
 
 assume(L > 0, rho > 0);
 assume(z1 > 0, z2 > 0, z3 > 0);
@@ -79,4 +85,6 @@ ratsimp(subst(z1,z3,subst(z1,z2,PP)));
 
 /* Check z2 = z3 => y = 0 */
 ratsimp(subst(z2,z3,part(PP,2)));
+
+/**************************************************************************************************/
 

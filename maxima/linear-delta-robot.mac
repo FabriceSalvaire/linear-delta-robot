@@ -1,8 +1,18 @@
+/**************************************************************************************************
+ *
+ * Linear Delta Robot: Indirect Cinematic
+ *
+ **************************************************************************************************/
+
 /* maxima -b delta.mac */
+
+/**************************************************************************************************/
 
 /* Define some functions */
 vector(x, y, z):= transpose(matrix([x, y, z]));
 magnitude(x):= dotproduct(x, x); 
+
+/**************************************************************************************************/
 
 assume(z1 > z, z2 > z, z3 > z);
 assume(rho > 0, L > 0, L > rho);
@@ -42,52 +52,4 @@ Z1: part(solve(Eq1, z1), 2, 2);
 Z2: part(solve(Eq2, z2), 2, 2);
 Z3: part(solve(Eq3, z3), 2, 2);
 
-/* d z_i / d x_i */
-diff(Z1, x, 1);
-diff(Z1, y, 1);
-diff(Z2, x, 1);
-diff(Z2, y, 1);
-diff(Z3, x, 1);
-diff(Z3, y, 1);
-
-/* z_i @origin */
-subst(0, y, subst(0, x, Z1));
-subst(0, y, subst(0, x, Z2));
-subst(0, y, subst(0, x, Z3));
-
-/* Direct Cinematic */
-
-/* Resolve y */
-Sy: factor(part(solve(Eq2 - Eq3, y), 1, 2));
-A: factor(coeff(expand(Sy), z));
-B: factor(coeff(expand(Sy), z, 0));
-
-/* Resolve x */
-Sx: subst(A*z+B, y, part(solve(Eq2 - Eq1, x), 1, 2));
-C: factor(coeff(expand(Sx), z));
-D: factor(coeff(expand(Sx), z, 0));
-
-/* Resolve z */
-EqZ: subst(C*z+D, x, subst(A*z+B, y, part(Eq1, 2))) - L**2;
-E: factor(coeff(expand(EqZ), z^2));
-F: factor(coeff(expand(EqZ), z));
-G: factor(coeff(expand(EqZ), z, 0));
-
-/* Check z_i = Z */
-subst(z2, z3, A);
-subst(z2, z3, B);
-subst(z1, z2, subst(z2, z3, C));
-subst(z1, z2, subst(z2, z3, D));
-/* -> 0 */
-subst(z1, z2, subst(z2, z3, E));
-subst(z1, z2, subst(z2, z3, F));
-subst(z1, z2, subst(z2, z3, G));
-solve(subst(z1, z2, subst(z2, z3, EqZ))=0,z);
-/* -> [z=z1−sqrt(L^2−rho^2),z=sqrt(L^2−rho^2)+z1] */
-
-Sz: solve(E*z^2 + F*z + G = 0, z);
-expand(subst(z1, z2, subst(z2, z3, Sz)));
-
-/* (−y^2−x^2+2*rho*x−rho^2) - expand(-(x-rho)^2-y^2); */
-/* (−y^2+sqrt(3)*rho*y−x^2−rho*x−rho^2) - expand(-(x+rho/2)^2-(y-sqrt(3)/2*rho)^2); */
-/* (−y^2−sqrt(3)*rho*y−x^2−rho*x−rho^2) - expand(-(x+rho/2)^2-(y+sqrt(3)/2*rho)^2); */
+/**************************************************************************************************/

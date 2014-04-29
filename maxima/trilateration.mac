@@ -1,3 +1,9 @@
+/**************************************************************************************************
+ *
+ * Trilateration: compute the general intersection of three spheres
+ *
+ **************************************************************************************************/
+
 /* maxima -b file.mac */
 
 reset();
@@ -8,6 +14,8 @@ load("eigen");
 /* Define some functions */
 norm_square(x):= x.x;
 norm(x):= sqrt(norm_square(x));
+
+/**************************************************************************************************/
 
 /* Let be a point in the space */
 P: [x, y, z];
@@ -23,34 +31,41 @@ S2: norm_square(P - O2) - r2^2;
 S3: norm_square(P - O3) - r3^2;
 
 /*
+ * Note on system of equation:
+ *
  * f(x,y,z) = 0
  * g(x,y,z) = 0
  * =>
- * f(x,y,z) - g(x,y,z) = 0
+ *   f(x,y,z) - g(x,y,z) = 0
  * =/=>
- * f(x,y,z) = g(x,y,z) = 0
+ *   f(x,y,z) = g(x,y,z) = 0
  *
  */
 
 /* We compute the intersection of C1 and C2 */
-
-expand(S1-S2);
+expand(S1 - S2);
 solve(%, x);
 X: part(%, 1, 2);
 
-/* We assume d - r1 < r2 < d + r2 */
+/* We assume that the first two spheres intersect in more than one point:
+ *   d - r1 < r2 < d + r2
+ */
 
 /* Intersection of S1 and S2 is a circle */
 Circle: subst(X, x, S1);
 
+/* We express z^2 from the S1 equation */ 
 solve(S1, z^2);
 Z2: part(%, 1, 2);
+/* and we substitute z^2 in the S3 equation to get y as a function of x */ 
 expand(subst(Z2, z^2, S3));
 solve(%, y);
 Y: part(%, 1, 2);
 
 Y: ratsimp(subst(X, x, Y));
 Z2: ratsimp(subst(X, x, subst(Y, y, Z2)));
+
+/**************************************************************************************************/
 
 /* Centres of the spheres */
 P1: [p1_x, p1_y, p1_z];
@@ -69,3 +84,5 @@ j: (P3 - P1).e_y;
 
 /* Solution */
 P1 + P*[e_x, e_y, e_z];
+
+/**************************************************************************************************/

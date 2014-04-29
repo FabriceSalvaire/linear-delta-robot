@@ -402,40 +402,42 @@ def plot_delta():
 
 ####################################################################################################
 
+def test():
+
+    z = 1
+    zi = float(indirect_cinematic((0, 0, z), stack_zi=False)[0])
+    print "p = [0, 0, 1] :", direct_cinematic((zi, zi, zi))
+    
+    print
+    p = direct_cinematic((0, 0, 0), z_offset=L)
+    print "p:", p
+    print "zi = 0 :", indirect_cinematic(p) - L
+    
+    print
+    p = direct_cinematic((1, 2, 3), z_offset=L)
+    print "p:", p
+    print "zi = [1, 2, 3] :", indirect_cinematic(p) - L
+    
+    print
+    zi = []
+    X = 5
+    for z1 in xrange(-X, X):
+        for z2 in xrange(-X, X):
+            for z3 in xrange(-X, X):
+                zi.append((z1, z2, z3))
+    zi = np.array(zi)
+    print "zi :", zi
+    p = direct_cinematic(zi, z_offset=L)
+    print "p:", p
+    print "delta zi = 0 :", np.all((indirect_cinematic(p) - L - zi) < 1e-6)
+
+####################################################################################################
+
 # plot_workspace_circles()
 # plot_workspace()
 # plot_zi()
 plot_delta()
 plt.show()
-
-####################################################################################################
-
-# z = 1
-# zi = float(indirect_cinematic((0, 0, z), stack_zi=False)[0])
-# print "p = [0, 0, 1] :", direct_cinematic((zi, zi, zi))
-
-# print
-# p = direct_cinematic((0, 0, 0), z_offset=L)
-# print "p:", p
-# print "zi = 0 :", indirect_cinematic(p) - L
-
-# print
-# p = direct_cinematic((1, 2, 3), z_offset=L)
-# print "p:", p
-# print "zi = [1, 2, 3] :", indirect_cinematic(p) - L
-
-# print
-# zi = []
-# X = 5
-# for z1 in xrange(-X, X):
-#     for z2 in xrange(-X, X):
-#         for z3 in xrange(-X, X):
-#             zi.append((z1, z2, z3))
-# zi = np.array(zi)
-# print "zi :", zi
-# p = direct_cinematic(zi, z_offset=L)
-# print "p:", p
-# print "delta zi = 0 :", np.all((indirect_cinematic(p) - L - zi) < 1e-6)
 
 ####################################################################################################
 #

@@ -358,6 +358,46 @@ dvips,%
  \end{tikzpicture}
 \end{center}
 %
+\begin{center}
+\tikzsetnextfilename{cinematic-chain}
+\begin{tikzpicture}
+  [solid/.style={draw,rectangle,rounded corners=1mm,thick,}]
+  \node (bati) at (0,0) [solid] {bâti};
+  \def\levelOneX{5}
+  \def\levelOneY{3}
+  \def\levelTwoY{.5}
+  \node (coulisseau1) at (\levelOneX,\levelOneY) [solid] {coulisseau 1};
+  \node (bras1) at (2*\levelOneX,\levelOneY+\levelTwoY) [solid] {bras 1};
+  \node (bras2) at (2*\levelOneX,\levelOneY-\levelTwoY) [solid] {bras 2};
+  %
+  \node (coulisseau2) at (\levelOneX,0) [solid] {coulisseau 2};
+  \node (bras3) at (2*\levelOneX,\levelTwoY) [solid] {bras 3};
+  \node (bras4) at (2*\levelOneX,-\levelTwoY) [solid] {bras 4};
+  %
+  \node (coulisseau3) at (\levelOneX,-\levelOneY) [solid] {coulisseau 3};
+  \node (bras5) at (2*\levelOneX,-\levelOneY+\levelTwoY) [solid] {bras 5};
+  \node (bras6) at (2*\levelOneX,-\levelOneY-\levelTwoY) [solid] {bras 6};
+  %
+  \node (nacelle) at (3*\levelOneX,0) [solid] {nacelle};
+  %
+  \draw (bati) -- node [above left] {glissière} (coulisseau1.west);
+  \draw (bati) -- node [above] {glissière} (coulisseau2.west);
+  \draw (bati) -- node [below left] {glissière} (coulisseau3.west);
+  \draw (coulisseau1.east) -- node [above left] {rotule} (bras1.west);
+  \draw (coulisseau1.east) -- node [below left] {rotule} (bras2.west);
+  \draw (coulisseau2.east) -- node [above left] {rotule} (bras3.west);
+  \draw (coulisseau2.east) -- node [below left] {rotule} (bras4.west);
+  \draw (coulisseau3.east) -- node [above left] {rotule} (bras5.west);
+  \draw (coulisseau3.east) -- node [below left] {rotule} (bras6.west);
+  \draw (bras1.east) -- node [above right] {rotule} (nacelle);
+  \draw (bras2.east) -- node [below left] {rotule} (nacelle);
+  \draw (bras3.east) -- node [above right] {rotule} (nacelle);
+  \draw (bras4.east) -- node [below right] {rotule} (nacelle);
+  \draw (bras5.east) -- node [above left] {rotule} (nacelle);
+  \draw (bras6.east) -- node [below right] {rotule} (nacelle);
+\end{tikzpicture}
+\end{center}
+%
 \end{document}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

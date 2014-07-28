@@ -10,6 +10,12 @@ import matplotlib.pyplot as plt
 
 ####################################################################################################
 #
+# Mesh - -> +
+#
+####################################################################################################
+
+####################################################################################################
+#
 # Linear Delta Robot Parameters
 #
 ####################################################################################################
@@ -92,7 +98,7 @@ def vdot(a, b):
 ####################################################################################################
 
 def vcross(a, b):
-    """ vectorized dot """
+    """ vectorized cross product """
     if len(a.shape) == 2:
         return np.cross(a, b, axisa=-1, axisb=-1, axisc=-1)
     else:
@@ -618,13 +624,99 @@ def plot_delta():
 
 ####################################################################################################
 
+def compute_angles(x, y, z):
+
+    N = x.shape[0]
+    x.shape = N**2
+    y.shape = N**2
+
+    z1, z2, z3 = indirect_cinematic((x, y, z), stack_zi=False)
+
+    # p1 = zi_to_pi(Ax1, Ay1, z1 - z)
+    # p = zi_to_pi(x, y, 0)
+
+    p1 = np.zeros((N**2, 3))
+    p1[:,0] = Ax1
+    p1[:,1] = Ay1
+    # p1[:,2] = 0
+    p1[:,2] = z1 - z
+    p = np.zeros((N**2, 3))
+    p[:,0] = x
+    p[:,1] = y
+    p[:,2] = 0
+    o = np.zeros((N**2, 3))
+    o[:,0] = x
+    o[:,1] = 0
+    o[:,2] = 0
+    v1 = o - p1
+    v2 = p - p1
+
+    # |v1 x v2| = |v1| |v2| |sin n|
+    sin_alpha1 = norm(vcross(v1, v2)) / (norm(v1)*norm(v2))
+    # sin_alpha1 = np.abs(y) / L
+    # sin_alpha1.shape = N, N
+
+    # alpha1 = np.acos(np.sqrt(Vx1**2 + Vy1**2) / L)
+    # sin_alpha1 = norm(vcross(v1, v2)) / L**2 # (norm(-p1)*norm(p-p1))
+    # sin_alpha1 = norm(vcross(p, p1)) / L**2
+    alpha1 = np.degrees(np.arcsin(sin_alpha1))
+
+    # beta1 = np.degrees(np.arcsin(z1/L))
+    # beta1.shape = N, N
+
+    output = alpha1
+    output.shape = N, N
+    print output.min(), output.max()
+
+    return output
+
+####################################################################################################
+
+def plot_angles():
+
+    z = 0
+
+    # Define the XY mesh
+    # X = R
+    X = int(.8*R)
+    # number_of_points = (2*X + 1)*2/10
+    number_of_points = 300
+    x = np.linspace(-X, X, number_of_points)
+    x, y = np.meshgrid(x, x)
+
+    # Compute the valid region
+    valid = compute_valid_region(x, y, radius=R)
+    xv = x * valid
+    yv = y * valid
+
+    alpha1 = compute_angles(xv, yv, z)
+
+    # Correct for valid region
+    alpha1 = np.where(valid, alpha1, 0)
+
+    figure = plt.figure()
+    # axe = plt.subplot(111)
+    axe = plt.subplot(111, aspect='equal')
+    axe.grid()
+    axe.set_title('alpha 1')
+    image = axe.imshow(alpha1, extent=(-X, X, -X, X), aspect='equal')
+    plt.colorbar(image)
+    patch0 = Circle((0, 0), R, fc="white", alpha=0)
+    axe.add_artist(patch0)
+    axe.plot((0, Ax1, Ax2, Ax3, Px1, Px2, Px3),
+             (0, Ay1, Ay2, Ay3, Py1, Py2, Py3),
+             'o')
+    
+####################################################################################################
+
 #plot_workspace_circles()
 #plot_workspace()
 #plot_jacobian_determinant()
 #plot_jacobian()
-plot_jacobian_inverse()
+#plot_jacobian_inverse()
 #plot_zi()
 #plot_delta()
+plot_angles()
 plt.show()
 
 ####################################################################################################

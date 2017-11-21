@@ -1,0 +1,444 @@
+{{Project
+|name= Robot Delta
+|author= [[User:Fabrice|Fabrice]]
+|proposal_date=
+|abstract1= Cette page a pour vocation de rassembler des informations sur le robot Delta inventé par [http://people.epfl.ch/cgi-bin/people?id=104789&lang=fr&cvlang=fr Reymond Clavel à l'EPFL], en particulier sur le robot Delta linéaire. En premier lieu, cette article présente des exemples de réalisations et une bibliographie sur le sujet. Ensuite nous discuterons toute la théorie mathématique indispensable à la mise en œuvre d'un robot Delta linéaire: cinématique directe et indirecte, espace de travail et singularités, matrice Jacobienne, dynamique et précision. Des codes de calculs numériques écrient en Python sont aussi fournit afin d'illustrer les calculs sur un exemple réel d'application.
+|abstract5=
+|tags= robot, delta, linéaire, imprimante 3d
+|where= 
+|for_who= ceux qui aiment la cinématique et la théorie des groupes ;-)
+|official_electrolab_project=
+|elecrolab_project_manager=
+|budget=
+|number_of_members=
+|estimated_time=
+}}
+
+= Abstract =
+
+This wiki page talks on Delta robot invented by Reymond Clavel at EPFL and especially on linear Delta robot.
+
+All the mathematical background involved in the oprating of the linear delta robot is discussed in the followings:
+* direct and indirect cinematic,
+* Jacobian matrix, dynamic and accuracy,
+* workspace computation and singularities,
+* numerical computations for a real case.
+
+= Sous-pages et Liens Externes =
+
+* Ce [http://github.com/FabriceSalvaire/linear-delta-robot dépôt GitHub] contient les fichiers annexes (codes de calculs en Python, notebooks Maxima): git@github.com:FabriceSalvaire/linear-delta-robot.git
+
+= Colophon =
+
+L'ensemble des calculs ont été vérifié ou calculé avec l'antique logiciel de calcul formel Maxima qui est Open Source (libéré en octobre 1998 sous l'impulsion de William Schelter et l'accord du DOE).
+
+Les figures ont été réalisé avec l'époustouflant package Tikz pour LaTeX développé par Till Tantau qui permet de faire des graphiques complexes et de qualité irréprochable. Un exemple en matière de conception logiciel où il est difficile de trouver les limites, bien que TeX est été conçu en 1977.
+
+= Les Robots Delta =
+
+Le robot Delta a été inventé par Reymond Clavel en 1985, ingénieur doctorant à l'École polytechnique fédérale de Lausanne (EPFL), afin de répondre à la problématique d'un robot manipulateur doté de trois degrés de liberté et une grande accélération. En l’occurrence la première implémentation fût un robot manipulateur de chocolats.
+
+Par rapport aux architectures classiques tel que le robot Scara (Selective Compliance Assembly Robot Arm), les robots delta peuvent atteindre de très grandes accélérations mais avec un volume de travail plus restreint et une cinématique bien plus complexe qu'un centre d'usinage 3 axes classique.
+
+L'architecture est particulièrement adapté à des mouvements rapides dans l'espace et des efforts sur l'axe z du robot.
+
+== Le Robot Delta Linéaire (Vertical) ==
+
+La nacelle a 3 degrés de liberté qui sont les trois translations dans l'espace. Elle reste toujours parallèle au plan horizontale, contrairement à une plateforme de Stewart (hexapod) qui peut faire varier la longueur de ses 6 bras et donc faire pivoter la nacelle. La position de la nacelle est entièrement déterminé par les positions verticales des trois coulisseaux. 
+
+[[File:rostock-animation.gif|frame|center|Animation d'une Rostock (licence ?)]]
+
+= Exemples de réalisations =
+
+== Exemples de réalisations dans l'industrie ==
+
+* Urane SX de Comau (ex RENAULT AUTOMATION de Castres) et développé à l'origine par le LIRMM (Laboratoire d'informatique, de robotique et de micro-électronique CNRS-Université Montpellier 2). Ce centre d’usinage horizontal est basé sur une architecture Delta linéaire et des moteurs linéaires, ce qui la rend particulièrement adapté à l'usinage grande vitesse d'alésages et de lamages.
+** [http://www.comau.com/fra/offering_competence/powertrain/products/machining_systems/Pages/urane.aspx lien Urane @Comau]
+** [http://www.youtube.com/watch?v=x8YowyrItU4 vidéo de l'Urane SX]
+
+== Exemples de réalisations d'imprimantes 3D ==
+
+* la page [http://reprap.org/wiki/Delta Delta @reprap.org]
+
+* le modèle [http://reprap.org/wiki/Rostock Rostock]
+* [http://www.youtube.com/watch?list=PL5B0883060C478E48&v=AYs6jASd_Ww Vidéo montrant la Rostock en action]
+* [http://www.thingiverse.com/thing:80472 Enlarged Rostock]
+* le modèle [https://www.logre.eu/wiki/DeltaRap DeltaRap @LOG (Laboratoire Ouvert Grenoblois)]
+* le modèle [http://www.3ders.org/articles/20140326-igus-introduces-world-first-tribo-plastic-filament-for-3d-printers.html Igus 3D Printer]
+
+== Exemples de réalisations de CNCs ==
+
+Une delta linéaire verticale piloté par EMC2:
+* [http://www.youtube.com/watch?v=FgnxBaFFDi8 vidéo (séquence avec un comparateur)]
+* liaison glissière DIY avec un profilé alu
+* vis trapézoïdale avec écrou en bronze
+* 3*2 bras en tige filetée et montée avec des rotules
+
+
+Une delta linéaire horizontale:
+* [http://www.youtube.com/watch?v=O7pc1B3rnMY vidéo]
+
+
+Une plateforme de Stewart (Hexapod) avec une petite tête de fraisage, piloté par EMC2:
+* [http://www.youtube.com/watch?v=G_UmhUjZhNo vidéo 1]
+* [http://www.youtube.com/watch?v=nebJ59TcYlQ vidéo 2]
+* réalisation plutôt sérieuse
+* 3*2 bras montés sur vis à bille et joint de cardan (mais pas de détail sur la mécanique)
+
+
+Design intéressant d'une delta classique légère:
+* [http://www.youtube.com/watch?v=5MOSnFSx8JQ vidéo]
+* moteur d’essuie glace avec encodeur magnétique
+* conception légère mais suffisante pour une imprimante 3D (à vérifier)
+
+= Bibliographie =
+
+Tous les PDF sont disponible via Google ...
+
+== Raymond Clavel, le père du robot Delta ==
+
+* [http://jnrr2011.irccyn.ec-nantes.fr/presentations/ReymondClavel.pdf Conception d'un robot rapide à 4 degrés de liberté, Thèse de Reymond Clavel @EPFL (PDF)]
+* [http://www-lagis.univ-lille1.fr/~vasseur/robotique/Articles_Technique_de_l_Ingenieur/robots_paralleles.pdf Article TI de Reymond Clavel (PDF)]
+
+== Livres ==
+
+* A mathematical introduction to robotic manipulation, Richard M. Murray, California Institute of Technology, Zexiang Li, Hong Kong University of Science and Technology, S. Shankar Sastry, University of California, Berkeley, CRC Press, http://www.cds.caltech.edu/~murray/mlswiki
+* Parallel Robots, J.-P. MERLET, INRIA, Sophia-Antipolis, Springer
+* Robot Manipulator Control Theory and Practice, Frank L.Lewis, University of Texas, Darren M.Dawson, University Clemson, Chaouki T.Abdallah, University of New Mexico, Marcel Dekker
+
+== Thèses ==
+
+* Analyse cinétostatique des machines parallèles à translations, thèse de Félix MAJOU, École Centrale Nantes
+* Analysis and Synthesis of Parallel Robots for Medical Applications, thesis of Nabil Simaan, Technion, Israel Institute Of Technology
+* Conception de robots de très haute précision à articulations flexibles: interaction dynamique-commande, thèse de Jean-Philippe BACHER, EPFL
+* Contribution à l’amélioration de la précision des robots parallèles, thèse de David Corbel, université Montpellier II
+* Design and Analysis of a Three Degrees of Freedom Parallel Kinematic Machine, thesis of Xiaolin Hu, University of Ontario Institute of Technology
+* Improving the accuracy of parallel robots, Thesis of Peter Vischer, EPFL
+
+== Articles ==
+
+* A New Approach to the Design with a Desired Workspace of a DELTA Robot, Xin-Jun Liu, Journal of Intelligent and Robotic Systems 39: 209–225, 2004.
+* voir aussi la page de discussions
+
+= Cinématique d'un robot delta linéaire vertical =
+
+== Pièces et liaisons cinématiques ==
+
+Les pièces et liaisons composant le robot Delta linaire sont:
+* trois coulisseaux en liaison glissière par rapport au bâti. Les trois liaisons glissière forment les trois axes du robot. Ces axes peuvent être verticaux ou horizontaux, mais aussi dans une configuration non parallèle, par exemple disposé sur les arêtes d'une pyramide à base triangulaire (Delta Keops).
+* une nacelle
+* Deux types de liaison sont possibles entre les coulisseaux et la nacelle:
+** configuration avec trois bras et des joints de cardan (rotule à doigt) à chaque extrémité des bras
+** configuration avec trois paires de bras (barres parallèles) et des rotules à chaque extrémité des bras
+
+Dans le premier cas la rotation dans l'espace de la nacelle est bloqué par la disposition des joints de cardan. Dans le second cas la paire de bras forme un parallélogramme puisque les longueurs de ses côtés opposés sont identiques. La nacelle est donc aussi bloqué en rotation et en translation horizontale tant que les parallélogrammes ne sont pas en torsion. En pratique on place un ressort entre les barres parallèle au niveau des rotules afin d'éliminer les 6 degrés de liberté parasites (rotation longitudinal) en préchargeant les rotules.
+ 
+[[File:cinematic-chain.png|thumb|center|800px|chaîne cinématique]]
+
+Calcul du degré d'hyperstatisme pour la configuration avec des rotules:
+
+* Nombre de pièces: <math> n = 1 + 1 + 3 \times (1+2) = 11 </math> pièces
+* Nombre d'équations statiques: <math> Es = 6(n-1) = 60 </math> équations
+* Nombre d'inconnues statiques: 3 liaisons glissières et 12 liaisons rotules, soit <math> Is = 3 \times 5 + 12 \times 3 = 51 </math> inconnues
+
+La mobilités du mécanismes est la somme des mobilités utiles et internes: <math> m = mu + mi = 3 + 6 = 9 </math>
+
+D’après la théorie des mécanismes, le degré d'hyperstatisme d'une chaîne cinématique est <math> h = Is - (Es - m) </math>.
+
+Dans notre cas il vient <math> h = 51 + 9 - 60 = 0 </math>, le système est donc isostatique.
+
+== Géométrie et symétrie du robot ==
+
+[[image:schema-top-view.png|right|400px]]
+[[image:schema-side-view.png|right|400px]]
+[[image:schema-top-view-moved.png|right|400px]]
+[[image:schema-top-view-moved-sphere.png|right|400px]]
+
+Glissement progressif vers le plaisir ... cinématique!
+
+Lien vers le fichier Maxima [http://github.com/FabriceSalvaire/linear-delta-robot/blob/master/linear-delta-robot.mac linear-delta-robot.mac].
+
+Le robot delta linéaire verticale est invariant par translation selon l'axe vertical (dans le cas d'un axe infini) et invariant par rotation de <math>\frac{2 \pi}{3}</math> selon ce même axe. Les trois axes verticaux forment un triangle équilatéral et sont inscrit dans un cercle centré à l'origine du référentiel.
+
+Le référentiel de la machine à pour origine <math>O</math> le centre de symétrie du plateau bas, l'axe des <math>x</math> pointe vers un des trois axes verticaux et l'axe des <math>z</math> pointe vers le haut. Le référentiel forme un trièdre direct, ce qui défini l'axe des <math>y</math>.
+
+Les centres des rotules au niveau des coulisseaux sont notés <math>A_i</math> où <math>i=1,2,3</math> et sont disposés de manière équidistante sur un cercle de centre <math>R</math> aux angles <math>\theta_i = \frac{2 \pi}{3} (i -1)</math> et à la position <math>z_i</math> sur l'axe vertical.
+
+On note <math> \mathcal{R}_i =
+  \begin{pmatrix}
+    cos(\theta_i) & - sin(\theta_i) \\
+    sin(\theta_i) & cos(\theta_i)
+  \end{pmatrix}
+</math>
+la rotation d'angle <math>\theta_i</math>.
+
+Les rotations correspondantes aux trois axes sont:
+<math>
+  \mathcal{R}_1 = I_2
+  \quad
+  \mathcal{R}_2 = -\frac{1}{2}
+  \begin{pmatrix}
+    1 & \sqrt{3} \\
+    -\sqrt{3} & 1
+  \end{pmatrix}
+  \quad
+  \mathcal{R}_3 = -\frac{1}{2}
+  \begin{pmatrix}
+    1 & -\sqrt{3} \\
+    \sqrt{3} & 1
+  \end{pmatrix} 
+</math>
+
+Le centre de la nacelle est notée <math> N = \begin{pmatrix} x \\ y \\ z \end{pmatrix} </math> et les centres des rotules sont notés <math>N_i</math> et sont disposés sur un cercle de centre <math>r</math> et aux angles <math>\theta_i</math>.
+
+Les bras ont une longueur constante <math> L = \lVert \overrightarrow{A_i N_i \,} \rVert </math>. On note <math>\rho = R - r </math> la longueur minimal des bras pour lequel la nacelle est connecté mais figé au centre. Usuellement on choisira une longueur plus grande afin d'avoir une amplitude de mouvement suffisante. Par construction la nacelle sera toujours en dessous des articulations. Le rayon <math>\rho</math> corresponds aussi à la limite au delà duquel la nacelle peut heurté les axes verticaux, on considère par la suite que l'espace de travail est nécessairement inclue dans ce cercle.
+
+La position de la nacelle est entièrement déterminé par les coordonnées <math>z_i</math>.
+
+== Cinématique indirecte ==
+
+On résout la cinématique indirecte en fermant la chaîne cinématique pour chaque bras:
+<math>
+  \overrightarrow{A_i N_i \,} =
+  \overrightarrow{O N \,} + \overrightarrow{N N_i \,} - \overrightarrow{O A_i \,}
+</math>.
+
+On définit les points <math>
+  P_i =
+  \begin{pmatrix}
+  x_i \\
+  y_i \\
+  z_i
+  \end{pmatrix}
+</math>
+où
+<math>
+  \begin{pmatrix} x_i \\ y_i \end{pmatrix} =
+  \mathcal{R}_i \begin{pmatrix} \rho \\ 0 \end{pmatrix}
+</math> qui sont les points homothétiques des points <math>A_i</math> sur le cercle de rayon <math>\rho</math>.
+
+Les coordonnées des points <math>P_i</math> s'écrivent:
+<math>
+  \mathcal{P}_1 =  \rho \begin{pmatrix} 1 \\ 0 \\ z_1 \end{pmatrix}
+  \quad
+  \mathcal{P}_2 = \frac{\rho}{2} \begin{pmatrix} -1 \\ \sqrt{3} \\ z_2 \end{pmatrix}
+  \quad
+  \mathcal{P}_3 = - \frac{\rho}{2} \begin{pmatrix} 1 \\ \sqrt{3} \\ z_3 \end{pmatrix}
+</math>
+
+Il vient <math> \overrightarrow{A_i N_i \,} = N - P_i </math>.
+
+À partir de la norme de ce vecteur, on obtient un système de 3 équations reliant les coordonnées <math>z_i</math> et la position de la nacelle:
+
+<math> L^2 = (x - x_i)^2 + (y - y_i)^2 + (z - z_i)^2 </math>
+
+Chaque équation représente une sphère de rayon <math>L</math> centré sur le projeté du point <math>P_i</math> sur le plan de la nacelle. On choisit ce point car il permet de déterminer <math>z_i</math>.
+
+On tire du système d'équations la relation de la cinématique indirecte:
+
+<math> z_i = z + \sqrt{L^2 - (x - x_i)^2 - (y - y_i)^2} </math>
+
+puisque <math> z < z_i </math> par construction.
+
+On en déduit la contrainte géométrique <math> (x - x_i)^2 + (y - y_i)^2 < L^2 </math>, le centre de la nacelle est inscrit dans un cercle de rayon <math>L</math> centré sur le point <math>P_i</math>. L'intersection de ces trois cercles forment l'espace de travail de la machine.
+
+Le système d'équations s'écrit en exprimant les points <math>P_i</math>:
+
+<math>
+\begin{align}
+  L^2 & = \left(x - \rho\right)^2 + y^2 + \left(z - z_1\right)^2 \\
+  L^2 & = \left(x + \frac{\rho}{2}\right)^2 + \left(y + \frac{\sqrt{3}}{2}\rho\right)^2 + \left(z - z_2\right)^2 \\
+  L^2 & = \left(x + \frac{\rho}{2}\right)^2 + \left(y - \frac{\sqrt{3}}{2}\rho\right)^2 + \left(z - z_3\right)^2
+\end{align}
+</math>
+
+== Matrice Jacobienne ==
+
+En dérivant le système d'équations par rapport au temps, on obtiens le système d'équations différentielles suivant :
+
+<math>
+\Delta z_i\dot{z_i} = \Delta x_i\dot{x} + \Delta y_i\dot{y} + \Delta z_i\dot{z}
+</math>
+
+où <math> \Delta X_i = X - X_i </math>
+
+qui se réécrit sous forme matricielle :
+
+<math> \dot{Z} = J \dot{P} </math>
+
+où <math> \dot{P} = \begin{pmatrix} \dot{x} \\ \dot{y} \\ \dot{z} \end{pmatrix} </math> et
+<math> \dot{Z} = \begin{pmatrix} \dot{z_1} \\ \dot{z_2} \\ \dot{z_3} \end{pmatrix} </math>
+
+La matrice Jacobienne <math>J</math> (ou Jacobien) s'écrit alors :
+
+<math>
+J = \begin{pmatrix}
+ \frac{\Delta x_1}{\Delta z_1} & \frac{\Delta y_1}{\Delta z_1} & 1 \\
+ \frac{\Delta x_2}{\Delta z_2} & \frac{\Delta y_2}{\Delta z_2} & 1 \\
+ \frac{\Delta x_3}{\Delta z_3} & \frac{\Delta y_3}{\Delta z_3} & 1 \\
+\end{pmatrix}
+</math>
+
+Le Jacobien permet de calculer la vitesse des coulisseaux en fonction de la vitesse de la nacelle.
+
+Les points singuliers peuvent être déterminé à partir du déterminant du Jacobien :
+
+<math>
+det(J) = \frac{\eta}{\Delta z_1\,\Delta z_2\,\Delta z_3}
+</math>
+
+où
+<math>
+\eta = (\Delta x_1\,\Delta y_2 - \Delta x_2\,\Delta y_1)\Delta z_3 + (\Delta x_3\,\Delta y_1 - \Delta x_1\,\Delta y_3)\Delta z_2 + (\Delta x_2\,\Delta y_3 - \Delta x_3\,\Delta y_2)\Delta z_1
+</math>
+
+Le déterminant représente le volume du parallélépipède défini par les trois vecteurs composant le Jacobien: <math> \left( \frac{\Delta x_i}{\Delta z_i}, \frac{\Delta y_i}{\Delta z_i}, 1 \right) </math>.
+
+L'inverse du Jacobien s'écrit:
+
+<math>
+J^{-1} =
+\frac{1}{\eta}
+\begin{pmatrix}
+  \Delta y_2\,\Delta z_1\,\Delta z_3 - \Delta y_3\,\Delta z_1\,\Delta z_2 &
+ -\Delta y_1\,\Delta z_2\,\Delta z_3 + \Delta y_3\,\Delta z_1\,\Delta z_2 &
+  \Delta y_1\,\Delta z_2\,\Delta z_3 - \Delta y_2\,\Delta z_1\,\Delta z_3 \\
+ -\Delta x_2\,\Delta z_1\,\Delta z_3 + \Delta x_3\,\Delta z_1\,\Delta z_2 &
+  \Delta x_1\,\Delta z_2\,\Delta z_3 - \Delta x_3\,\Delta z_1\,\Delta z_2 &
+ -\Delta x_1\,\Delta z_2\,\Delta z_3 + \Delta x_2\,\Delta z_1\,\Delta z_3 \\
+  (\Delta x_2\,\Delta y_3 - \Delta x_3\,\Delta y_2)\Delta z_1 &
+ -(\Delta x_1\,\Delta y_3 - \Delta x_3\,\Delta y_1)\Delta z_2 &
+ (\Delta x_1\,\Delta y_2 - \Delta x_2\,\Delta y_1)\Delta z_3 \\
+\end{pmatrix}
+</math>
+
+Le système est non singulier si et seulement si le déterminant ou de manière équivalente <math>\eta</math> est différent de zéro.
+
+== Cinématique directe ==
+
+Le système d'équations de polynômes du second degré issu de la fermeture de la chaîne cinématique:
+
+<math> L^2 = (x - x_i)^2 + (y - y_i)^2 + (z - z_i)^2 </math>
+
+représente l'intersection de trois sphères de rayon <math>L</math> et de centre <math>P_i</math>. L'intersection de ses sphères donne la position de la nacelle en fonction de la position des bras.
+
+La résolution de ce système d'équations est parfois appelé trilateration dans la littérature.
+
+Afin de résoudre ce système d'équations, nous allons effectuer un changement de repère qui va simplifier les calculs. La nouvelle origine va coïncide au point <math>P_1</math>. L'axe des X pointe vers le point <math>P_2</math> et le plan XY est porté par les trois points <math>P_i</math>. L'axe des Y pointe du côté du point <math>P_3</math>. L'axe des Y est déterminé de manière à formé un trièdre direct.
+
+Dans ce nouveau repère les coordonnées des points <math>P_i</math> s'écrivent:
+
+<math>
+  \mathcal{P}_1 = \begin{pmatrix} 0 \\ 0 \\ 0 \end{pmatrix}
+  \quad
+  \mathcal{P}_2 = \begin{pmatrix} d \\ 0 \\ 0 \end{pmatrix}
+  \quad
+  \mathcal{P}_3 = \begin{pmatrix} i \\ j \\ 0 \end{pmatrix}
+</math>
+
+et le système d'équations devient:
+
+<math>
+\begin{align}
+  L^2 &= x^2 + y^2 + z^2 \\
+  L^2 &= (x - d)^2 + y^2 + z^2 \\
+  L^2 &= (x - i)^2 + (y - j)^2 + z^2
+\end{align}
+</math>
+
+Note concernant la résolution d'un système d'équations: si <math> f(x,y) = 0 </math> et <math> g(x,y) = 0 </math> alors le système <math> f(x,y) - g(x,y) = 0 </math> et <math> f(x,y) = 0 </math> est équivalent au premier, càd. à la seule condition que l'on conserve une des deux équations car la différence de deux nombres implique qu'ils sont égaux mais pas nulles.
+
+Pour résoudre ce nouveau système d'équations, on commence par soustraire la première et la deuxième équation et on résout pour <math>x</math>, il vient:
+
+<math> x = \frac{d}{2} </math>
+
+On réinjecte ce résultat dans la première équation et on obtient l'équation d'un cercle correspondant à l'intersection des deux premières sphères:
+
+<math> z^2 + y^2 = L^2 - \frac{d}{2}^2 </math>
+
+Notez que cette équation à une solution réelle si <math> d \leq 2L </math>.
+
+À présent on substitue <math> z^2 = L^2 - x^2 - y^2 </math> dans l'équation de la troisième sphère et on résout pour  <math>y</math>:
+
+<math>
+\begin{align}
+  y  &= \frac{i^2 + j^2}{2j} - \frac{i}{j}x \\
+     &= \frac{i^2 + j^2 - id}{2j}
+\end{align}
+</math>
+
+À présent nous avons résolut les deux premières coordonnées et nous pouvons tirer la troisième à partir de l'équation du la première sphère:
+
+<math>
+\begin{align}
+  z  &= \pm \sqrt{L^2 - x^2 - y^2} \\
+     &= \pm \sqrt{L^2 - \frac{d^2}{4} - \left( \frac{i^2 + j^2 - id}{2j} \right)^2 }
+\end{align}
+</math>
+
+Notez que cette solution est réelle si et seulement si la troisième sphère et le cercle ont une intersection, càd. si la racine est positive ou nulle.
+
+Afin d'exprimer les coordonnées de la solution dans le référentiel d'origine, nous allons exprimer le changement de repère:
+
+<math> P = P_1 + x\;\hat{e}_x + y\;\hat{e}_y + z\;\hat{e}_z </math>
+
+Le premier vecteur unitaire s'écrit:
+
+<math> \hat{e}_x = \frac{P_2 - P_1}{\| P_2 - P_1 \|} </math>
+
+et les deux premières distances:
+
+<math>
+\begin{align}
+  d &= \| P_2 - P_1 \| \\
+  i &= (P_3 - P_1)  \cdot \hat{e}_x
+\end{align}
+</math>
+
+Le second vecteur unitaire s'écrit:
+
+<math> \hat{e}_y = \frac{P_3 - P_1 - i\;\hat{e}_x}{\| P_3 - P_1 - i\;\hat{e}_x \|} </math>
+
+et la troisième distance:
+
+<math> j = ( P_3 - P_1 ) \cdot \hat{e}_y </math>
+
+Le troisième vecteur unitaire s'écrit <math> \hat{e}_z = \hat{e}_x \times \hat{e}_y </math>
+
+Nous avons à présent résolut la cinématique directe de manière analytique, mais il n'existe pas d'expression simple de la position de la nacelle en fonction des positions des bras. C'est pourquoi nous ne chercherons pas à développer les expressions.
+
+On définit <math> z_{ij} = z_i - z_j </math>.
+
+<math>
+  \mathcal{P}_{21} = \begin{pmatrix} -\frac{3}{2}\rho \\  \frac{\sqrt{3}}{2}\rho \\ z_{21} \end{pmatrix} \quad
+  \mathcal{P}_{31} = \begin{pmatrix} -\frac{3}{2}\rho \\ -\frac{\sqrt{3}}{2}\rho \\ z_{31} \end{pmatrix} \quad
+  \mathcal{P}_{32} = \begin{pmatrix} 0 \\ -\sqrt{3}\rho \\ z_{32} \end{pmatrix}
+</math>
+
+<math>
+  \mathcal{L}_{21} = \sqrt{3\rho^2 + z_{21}^2} \quad
+  \mathcal{L}_{31} = \sqrt{3\rho^2 + z_{31}^2} \quad
+  \mathcal{L}_{32} = \sqrt{3\rho^2 + z_{32}^2}
+</math>
+
+<math>
+  x\;\hat{e}_x = \frac{\mathcal{P}_{21}}{2} =
+  \begin{pmatrix} -\frac{3}{4}\rho \\ \frac{\sqrt{3}}{4}\rho \\ \frac{z_{21}}{2} \end{pmatrix}
+</math>
+
+<math>
+  i = \frac{\mathcal{P}_{31} . \mathcal{P}_{21}}{d} = \frac{1}{d} \left( \frac{3}{2}\rho^2 + z_{21}z_{31} \right)
+</math>
+
+<math>
+ i^2 + j^2 = \mathcal{L}_{31}^2 = 3\rho^2 + z_{31}^2
+</math>
+
+<math>
+  y = \frac{\mathcal{L}_{31}^2 - \mathcal{P}_{31}\mathcal{P}_{21}}{2 \mathcal{P}_{31} . \hat{e}_y}
+    = \frac{\frac{3}{2}\rho^2 + z_{31}^2 - z_{21}z_{31}}{2 \mathcal{P}_{31} . \hat{e}_y}
+</math>
+
+<math>
+  i . \hat{e}_x = \mathcal{P}_{31} . \mathcal{P}_{21} \frac{\mathcal{P}_{21}}{d}
+</math>
